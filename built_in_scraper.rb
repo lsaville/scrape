@@ -7,6 +7,10 @@ require './setup-capybara'
 
 class Scraper
   def initialize
+    @queue = create_queue
+  end
+
+  def create_queue
     connection = Bunny.new(
       :host => 'experiments.turing.io',
       :port => '5672',
@@ -15,10 +19,8 @@ class Scraper
     )
 
     connection.start
-
     channel = connection.create_channel
-
-    @queue = channel.queue('scrapers.to.lookingfor')
+    channel.queque('scrapers.to.lookingfor')
   end
 
   def self.scrape
