@@ -1,13 +1,12 @@
 require 'faraday'
 require 'nokogiri'
 require 'json'
-require 'pry'
 require 'bunny'
-require './setup-capybara'
 
 class Scraper
   def initialize
     @queue = create_queue
+    @conn  = create_conn
   end
 
   def create_queue
@@ -20,7 +19,11 @@ class Scraper
 
     connection.start
     channel = connection.create_channel
-    channel.queque('scrapers.to.lookingfor')
+    channel.queue('scrapers.to.lookingfor')
+  end
+
+  def create_conn
+    Faraday.new(:url => "http://www.builtincolorado.com/")
   end
 
   def self.scrape
@@ -37,15 +40,8 @@ class Scraper
     end
   end
 
-  #def job_urls_from_jobs_front_page
-  #  front_page = Faraday.get('http://www.builtincolorado.com/jobs#/jobs')
-  #  parsed_page = Nokogiri::HTML(front_page.body)
-  #  links = parsed_page.css('.job-title a').map { |link| link['href'] }
-  #end
-
   def job_urls_from_specific_page(page_index)
-    url = "http://www.builtincolorado.com/jobs#/jobs"
-    page = Faraday.get url, { :page => page_index}
+    page = @conn.get 'jobs#/jobs', { :page => page_index}
     parsed_page = Nokogiri::HTML(page.body)
     links = parsed_page.css('.job-title a').map { |link| link['href'] }
   end
@@ -61,15 +57,14 @@ class Scraper
   end
 
   def scrape_job_page(link)
-    url = "http://www.builtincolorado.com/#{link}"
-    page = Faraday.get(url)
+    page = @conn.get link
     parsed_page = Nokogiri::HTML(page.body)
     job = {
       title: parsed_page.css('.nj-job-title').text.strip,
       company: parsed_page.css('.nc-fallback-title').text.strip,
       company_url: parsed_page.css('.nj-company-website a')[0]['href'],
       description: parsed_page.css('.nj-job-body').to_html,
-      builtin_url: url,
+      builtin_url: "http://www.builtincolorado.com/#{link}",
     }
     job.to_json
   end
