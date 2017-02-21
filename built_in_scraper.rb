@@ -62,9 +62,8 @@ class Scraper
     job = {
       title: parsed_page.css('.nj-job-title').text.strip,
       company: parsed_page.css('.nc-fallback-title').text.strip,
-      company_url: parsed_page.css('.nj-company-website a')[0]['href'],
       description: parsed_page.css('.nj-job-body').to_html,
-      builtin_url: "http://www.builtincolorado.com/#{link}",
+      url: "http://www.builtincolorado.com/#{link}",
     }
     job.to_json
   end
