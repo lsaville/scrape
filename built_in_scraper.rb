@@ -63,7 +63,7 @@ class Scraper
       title: parsed_page.css('.nj-job-title').text.strip,
       company: parsed_page.css('.nc-fallback-title').text.strip,
       description: parsed_page.css('.nj-job-body').to_html,
-      url: "http://www.builtincolorado.com/#{link}",
+      url: "http://www.builtincolorado.com#{link}",
     }
     job.to_json
   end
