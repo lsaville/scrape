@@ -11,10 +11,10 @@ class Scraper
 
   def create_queue
     connection = Bunny.new(
-      :host => 'experiments.turing.io',
+      :host => 'monocle.turing.io',
       :port => '5672',
-      :user => 'student',
-      :pass => 'PLDa{g7t4Fy@47H'
+      :user => 'monocle',
+      :pass => 'RzoCoV7GR2wGAb'
     )
 
     connection.start
